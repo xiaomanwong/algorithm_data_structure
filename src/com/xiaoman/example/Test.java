@@ -1,20 +1,152 @@
 package com.xiaoman.example;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Stack;
 
-public class Main {
+public class Test {
 
     public static void main(String[] args) {
         // write your code here
-        Main main = new Main();
+        Test test = new Test();
 //        main.maoPao();
 //        main.xuanZe();
 //        main.insert();
 //        main.stack();
-//        main.stackStrus();
+//        test.stackStrus();
 //        main.changeChart();
-        main.heterotopicWord();
+//        test.heterotopicWord();
+        test.sort(2, 1, 7, 9, 5, 8, 6);
+    }
+
+
+    private void sort(int... nums) {
+//        System.out.println(Arrays.toString(nums));
+        boolean changed = true;
+        // 每轮遍历开始，将 changed 设置为 false
+        // 冒泡
+//        for (int i = 0; i < nums.length - 1 && changed; i++) {
+//            changed = false;
+//            for (int j = 0; j < nums.length - 1 - i; j++) {
+//                if (nums[j] > nums[j + 1]) {
+//                    swap(nums, j, j + 1);
+//                    changed = true;
+//                }
+//            }
+//        }
+
+        // 插入
+
+
+//        for (int i = 1, k, current; i < nums.length; i++) {
+//            current = nums[i];
+//            for (k = i - 1; k >= 0 && nums[k] > current; k--) {
+//                nums[k + 1] = nums[k];
+//            }
+//            nums[k + 1] = current;
+//        }
+
+        // 归并
+        int low = 0, high = nums.length - 1;
+//        System.out.println(Arrays.toString(nums));
+        guibing(nums, low, high);
+        System.out.println(Arrays.toString(nums));
+//        System.out.println(Arrays.toString(hebing()));
+    }
+
+
+    public int[] hebing() {
+        int[] A = new int[]{6, 1, 2, 5};
+        int[] B = new int[]{3, 7, 4, 9, 8};
+        int[] retValue = new int[A.length + B.length];
+
+
+        // 两个有序数组的排序
+        Arrays.sort(A);
+        Arrays.sort(B);
+
+        int count = 0;
+
+//        for (int i = 0; i < retValue.length; i++) {
+//            for (int j = 0; j < A.length; j++) {
+//                for (int k = 0; k < B.length; k++) {
+//                    if (A[j] < B[k]) {
+//                        retValue[i] = A[j];
+//                    } else {
+//                        retValue[i] = B[k];
+//                    }
+//                    count++;
+//                }
+//            }
+//        }
+
+        for (int i = 0, j = 0, k = 0; i < retValue.length; i++) {
+            if (j >= A.length) {
+                retValue[i] = B[k++];
+            } else if (k >= B.length) {
+                retValue[i] = A[j++];
+            } else if (A[j] < B[k]) {
+                retValue[i] = A[j++];
+            } else {
+                retValue[i] = B[k++];
+            }
+            count++;
+        }
+        System.out.println(count);
+        return retValue;
+    }
+
+
+    // 需要用到递归思想
+    // 使用递归，需要注意终止值的判断
+    private void guibing(int[] nums, int low, int high) {
+
+
+        if (low >= high) return;
+
+        int mid = (low + high) / 2;
+        guibing(nums, low, mid);
+        System.out.println("第一次： low = " + low
+                + " high = " + mid + "  " + Arrays.toString(nums));
+        guibing(nums, mid + 1, high);
+        System.out.println("第二次： low = " + (mid + 1)
+                + " high = " + high + "  " + Arrays.toString(nums));
+
+        merge(nums, low, high, mid);
+        System.out.println("结果： " + Arrays.toString(nums));
+    }
+
+    private void merge(int[] nums, int low, int high, int mid) {
+        // 复制一份原来的数组
+        int[] copy = nums.clone();
+        // 定义一个 k 指针，表示从什么位置开始修改原来的数组，
+        // i 指针表示左半边的起始位置，j 表示右半边的起始位置
+        int k = low, i = low, j = mid + 1;
+
+        while (k <= high) {
+            System.out.println("k = " + k + " i = " + i + " j = " + j + " high = " + high);
+            if (i > mid) { // 右侧已经合并完成， 将左侧数据直接写入到后续数组中
+                System.out.println("左侧已经合并完成 " + copy[j]);
+                nums[k++] = copy[j++];
+            } else if (j > high) { // 左侧合并完成，将右侧数据直接写入到后续数组中
+                System.out.println("左侧合并完成 赋值右侧数据" + copy[i]);
+                nums[k++] = copy[i++];
+            } else if (copy[j] < copy[i]) { // 右侧起始值比左侧数值小，将右侧数值交换到左侧顺序位置
+                System.out.println("右侧比左侧数值小 右侧值为 " + copy[j]);
+                nums[k++] = copy[j++];
+            } else {// 左侧值比右侧值小，写入对应顺序中
+                System.out.println("右侧值比左侧值大 、左侧值为 " + copy[i] + " 右侧值为 " + copy[i]);
+                nums[k++] = copy[i++];
+            }
+        }
+    }
+
+
+    public void swap(int[] nums, int src, int des) {
+        int temp = nums[src];
+        nums[src] = nums[des];
+        nums[des] = temp;
     }
 
     private void maoPao() {
@@ -204,11 +336,12 @@ public class Main {
             } else {
                 int stackSize = stack.size();
                 for (int i1 = 0; i1 < stackSize; i1++) {
-                    int pre = stack.pop();
+                    int pre = stack.peek();
+                    System.out.println(pre);
                     if (array[cur] > array[pre]) {
                         day[pre] = cur - pre;
+                        stack.pop();
                     } else {
-                        stack.push(pre);
                         break;
                     }
                 }
