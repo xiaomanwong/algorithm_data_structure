@@ -1,9 +1,9 @@
 package com.xiaoman.example;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Stack;
+
+import static com.xiaoman.example.util.MathUtil.rangInt;
 
 public class Test {
 
@@ -17,7 +17,7 @@ public class Test {
 //        test.stackStrus();
 //        main.changeChart();
 //        test.heterotopicWord();
-        test.sort(2, 1, 7, 9, 5, 8, 6);
+        test.sort(2, 1, 7, 9, 5, 8);
     }
 
 
@@ -50,9 +50,34 @@ public class Test {
         // 归并
         int low = 0, high = nums.length - 1;
 //        System.out.println(Arrays.toString(nums));
-        guibing(nums, low, high);
+//        sort(nums, low, high);
+        sortQuick(nums, low, high);
         System.out.println(Arrays.toString(nums));
 //        System.out.println(Arrays.toString(hebing()));
+    }
+
+
+    // 选择排序
+    // 遍历，选择一个最小值的索引，并将数据插入到最前
+    private void xuanze(int[] nums) {
+
+        // 外循环处理数据的交换
+        for (int i = 0; i < nums.length; i++) {
+            // 设定第一个值为最小值，获取其索引
+            int minIndex = i;
+            // 内循环处理寻找最小值索引的过程,默认第一个值为最小值，内部循环直接从数组的第二个值开始做
+            for (int j = i + 1; j < nums.length; j++) {
+                if (nums[j] < nums[minIndex]) {
+                    minIndex = j;
+                }
+            }
+            if (nums[i] > nums[minIndex]) {
+                swap(nums, i, minIndex);
+            }
+        }
+
+        System.out.println(Arrays.toString(nums));
+
     }
 
 
@@ -67,19 +92,6 @@ public class Test {
         Arrays.sort(B);
 
         int count = 0;
-
-//        for (int i = 0; i < retValue.length; i++) {
-//            for (int j = 0; j < A.length; j++) {
-//                for (int k = 0; k < B.length; k++) {
-//                    if (A[j] < B[k]) {
-//                        retValue[i] = A[j];
-//                    } else {
-//                        retValue[i] = B[k];
-//                    }
-//                    count++;
-//                }
-//            }
-//        }
 
         for (int i = 0, j = 0, k = 0; i < retValue.length; i++) {
             if (j >= A.length) {
@@ -97,47 +109,67 @@ public class Test {
         return retValue;
     }
 
+    private void sortQuick(int[] nums, int low, int high) {
+
+        // 只剩下一个元素
+        if (low >= high) return;
+
+
+        int basePoint = basePoint(nums, low, high);
+        System.out.println(basePoint);
+        sortQuick(nums, low, basePoint - 1);
+        sortQuick(nums, basePoint + 1, high);
+
+        System.out.println(Arrays.toString(nums));
+
+    }
+
+    private int basePoint(int[] nums, int low, int high) {
+
+        //  test.sort(6, 2, 1, 7, 9, 5, 8);
+        // 随机选择一个中间值，遍历数组，将比中间值小的数，放在左边，大的数放在右边
+        swap(nums, rangInt(high, low), high); // 将 high 替换为基准值
+        int i = low, j = low;
+        for (; j < high; j++) {
+            if (nums[j] <= nums[high]) {
+                swap(nums, i++, j);
+            }
+        }
+        swap(nums, i, j);
+        return i;
+    }
+
 
     // 需要用到递归思想
     // 使用递归，需要注意终止值的判断
-    private void guibing(int[] nums, int low, int high) {
-
-
+    private void sort(int[] nums, int low, int high) {
+        // 判断是否是最后一个元素（数组中，只有一个元素）
         if (low >= high) return;
-
+        // 从中间将数组分为两个部分
         int mid = (low + high) / 2;
-        guibing(nums, low, mid);
-        System.out.println("第一次： low = " + low
-                + " high = " + mid + "  " + Arrays.toString(nums));
-        guibing(nums, mid + 1, high);
-        System.out.println("第二次： low = " + (mid + 1)
-                + " high = " + high + "  " + Arrays.toString(nums));
-
+        // 分别递归将左右两半排序好
+        sort(nums, low, mid);
+        sort(nums, mid + 1, high);
+        // 将排序好的左右两半合并
         merge(nums, low, high, mid);
-        System.out.println("结果： " + Arrays.toString(nums));
     }
 
-    private void merge(int[] nums, int low, int high, int mid) {
-        // 复制一份原来的数组
+    private void merge(int[] nums, int start, int length, int mid) {
+        // 复制一份原来的数组,用来处理数据交换，否则会出现错误
         int[] copy = nums.clone();
-        // 定义一个 k 指针，表示从什么位置开始修改原来的数组，
-        // i 指针表示左半边的起始位置，j 表示右半边的起始位置
-        int k = low, i = low, j = mid + 1;
+        // 定义一个 index 指针，表示从什么位置开始修改原来的数组，
+        // left 指针表示左半边的起始位置，right 表示右半边的起始位置
+        int index = start, left = start, right = mid + 1;
 
-        while (k <= high) {
-            System.out.println("k = " + k + " i = " + i + " j = " + j + " high = " + high);
-            if (i > mid) { // 右侧已经合并完成， 将左侧数据直接写入到后续数组中
-                System.out.println("左侧已经合并完成 " + copy[j]);
-                nums[k++] = copy[j++];
-            } else if (j > high) { // 左侧合并完成，将右侧数据直接写入到后续数组中
-                System.out.println("左侧合并完成 赋值右侧数据" + copy[i]);
-                nums[k++] = copy[i++];
-            } else if (copy[j] < copy[i]) { // 右侧起始值比左侧数值小，将右侧数值交换到左侧顺序位置
-                System.out.println("右侧比左侧数值小 右侧值为 " + copy[j]);
-                nums[k++] = copy[j++];
+        while (index <= length) {
+            if (left > mid) { // 左侧已经合并完成， 将右侧数据直接写入到后续数组中，并自加索引
+                nums[index++] = copy[right++];
+            } else if (right > length) { // 左侧合并完成，将右侧数据直接写入到后续数组中
+                nums[index++] = copy[left++];
+            } else if (copy[right] < copy[left]) { // 右侧起始值比左侧数值小，将右侧数值交换到左侧顺序位置
+                nums[index++] = copy[right++];
             } else {// 左侧值比右侧值小，写入对应顺序中
-                System.out.println("右侧值比左侧值大 、左侧值为 " + copy[i] + " 右侧值为 " + copy[i]);
-                nums[k++] = copy[i++];
+                nums[index++] = copy[left++];
             }
         }
     }
